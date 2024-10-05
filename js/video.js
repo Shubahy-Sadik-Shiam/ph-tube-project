@@ -23,6 +23,19 @@ const loadVideos = () => {
 // Create Display Videos Catagories  ---->
 const displayVideos = (videos) => {
   const videoContainer = document.getElementById("videos");
+  videoContainer.innerHTML = "";
+  if(videos.length === 0){
+    videoContainer.classList.remove('grid')
+    videoContainer.innerHTML = `
+    <div class="flex mt-10 flex-col gap-5 justify-center items-center">
+      <img src="assets/Icon.png"/>
+      <p class="text-center font-bold text-4xl">Opps!! Sorry, No Video Found </p>
+    </div>
+    `
+  }
+  else{
+    videoContainer.classList.add('grid')
+  }
   videos.forEach((element) => {
     // console.log(element);
     const div = document.createElement("div");
@@ -58,12 +71,34 @@ const displayVideos = (videos) => {
 const displayCatagories = (categories) => {
   const categoryContainer = document.getElementById("category");
   categories.forEach((element) => {
-    const button = document.createElement("button");
-    button.classList = "btn";
-    button.innerText = element.category;
-    categoryContainer.append(button);
+    const buttonContainer = document.createElement("div");
+    buttonContainer.innerHTML = `
+      <button id ="btn-${element.category_id}" onclick ="loadCategoryVideos(${element.category_id})" class="btn category-btn">
+       ${element.category}
+      </button>
+    
+    `
+    categoryContainer.append(buttonContainer);
   });
 };
+// Create button clicking functionalities ------>
+const loadCategoryVideos = (id) => {
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/category/${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+        removeActiveClass();
+        const activeBtn = document.getElementById(`btn-${id}`)
+        activeBtn.classList.add('active')
+        displayVideos(data.category)
+    })
+    .catch((error) => console.log(error));
+}
+const removeActiveClass = () => {
+    const buttons = document.getElementsByClassName('category-btn');
+    for (let btn of buttons){
+        btn.classList.remove('active')
+    }
+}
 
 loadCategories();
 loadVideos();
