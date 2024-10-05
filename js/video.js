@@ -14,8 +14,8 @@ const loadCategories = () => {
     .catch((error) => console.log(error));
 };
 // Create load videos catagories ---->
-const loadVideos = () => {
-  fetch("https://openapi.programming-hero.com/api/phero-tube/videos")
+const loadVideos = (searchText ="") => {
+  fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
     .then((res) => res.json())
     .then((data) => displayVideos(data.videos))
     .catch((error) => console.log(error));
@@ -61,6 +61,7 @@ const displayVideos = (videos) => {
         ${element.authors[0].verified === true ? `<img class="h-4" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png"/>` : ""}
     </div>
        <p class="text-gray-400 text-xs">${element.others.views}</p>
+       <button onclick ="loadDetails('${element.video_id}')" class="btn bg-red-400 btn-sm">Details </button>
     </div>
   </div> 
         `;
@@ -99,6 +100,23 @@ const removeActiveClass = () => {
         btn.classList.remove('active')
     }
 }
-
+const loadDetails = async (videoId) => {
+    const url = `https://openapi.programming-hero.com/api/phero-tube/video/${videoId}`
+    const res = await fetch(url)
+    const data = await res.json()
+    displayDetails(data.video)
+}
+const displayDetails = (video) => {
+    const detailContainer = document.getElementById('modal-content')
+    detailContainer.innerHTML = `
+     <img src ="${video.thumbnail}"/>
+     <p>${video.description}</p>
+    
+    `
+    document.getElementById('customModal').showModal()
+}
+document.getElementById('search').addEventListener('keyup', (e) => {
+    loadVideos(e.target.value)
+})
 loadCategories();
 loadVideos();
